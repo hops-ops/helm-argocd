@@ -1,0 +1,20 @@
+# code: language=yaml
+#
+# Build $state.argocd with computed values for resource templates
+#
+
+{{- $eff := $state.spec.effective }}
+
+{{- $argocd := dict
+  "name" $eff.name
+  "clusterName" $eff.clusterName
+  "managementPolicies" $eff.managementPolicies
+  "labels" $eff.labels
+  "providerConfigRef" $eff.providerConfigRef
+  "namespace" $eff.namespace
+  "releaseName" $eff.releaseName
+  "values" $eff.values
+  "overrideAllValues" $eff.overrideAllValues
+}}
+
+{{- $state = set $state "argocd" $argocd }}

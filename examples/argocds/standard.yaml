@@ -1,0 +1,14 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: ArgoCD
+metadata:
+  name: argocd
+  namespace: example-env
+spec:
+  clusterName: example-cluster
+  labels:
+    team: platform
+  namespace: argocd
+  values:
+    server:
+      ingress:
+        enabled: false

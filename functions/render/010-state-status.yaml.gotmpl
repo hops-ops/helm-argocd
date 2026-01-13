@@ -1,0 +1,19 @@
+# code: language=yaml
+#
+# Compute status values from observed state
+#
+
+{{- $argo := $state.argocd }}
+{{- $obs := $state.observed }}
+
+{{- $helmReady := $obs.helmRelease.ready | default false }}
+{{- $ready := $helmReady }}
+
+{{- $state = set $state "status" (dict
+  "ready" $ready
+  "release" (dict
+    "name" $argo.releaseName
+    "namespace" $argo.namespace
+    "ready" $helmReady
+  )
+) }}

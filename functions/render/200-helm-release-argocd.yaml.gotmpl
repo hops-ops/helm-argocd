@@ -1,0 +1,40 @@
+# code: language=yaml
+#
+# Helm release for Argo CD
+#
+
+{{- $argo := $state.argocd }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $argo.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-argocd" }}
+  labels: {{ $argo.labels | toJson }}
+spec:
+  managementPolicies: {{ $argo.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: argo-cd
+      repository: https://argoproj.github.io/argo-helm
+      version: 7.7.16
+    namespace: {{ $argo.namespace }}
+    {{- if $argo.overrideAllValues }}
+    values:
+      {{- toYaml $argo.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: argocd
+      nameOverride: argocd
+      crds:
+        install: true
+      {{- if $argo.values }}
+      {{- toYaml $argo.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $argo.providerConfigRef.name }}
+    kind: {{ $argo.providerConfigRef.kind }}

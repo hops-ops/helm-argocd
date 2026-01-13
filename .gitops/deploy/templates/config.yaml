@@ -1,0 +1,22 @@
+apiVersion: pkg.crossplane.io/v1
+kind: Configuration
+metadata:
+  name: helm-argocd
+spec:
+  package: ghcr.io/hops-ops/helm-argocd:{{ .Values.version }}
+  packagePullSecrets:
+    - name: ghcr
+  skipDependencyResolution: {{ .Values.skipDependencyResolution }}
+
+{{- if .Values.skipDependencyResolution }}
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Function
+metadata:
+  name: hops-ops-helm-argocdrender
+spec:
+  package: ghcr.io/hops-ops/helm-argocd_render:{{ .Values.version }}
+  packagePullSecrets:
+    - name: ghcr
+  skipDependencyResolution: {{ .Values.skipDependencyResolution }}
+{{- end }}

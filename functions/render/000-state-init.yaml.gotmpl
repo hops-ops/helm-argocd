@@ -1,0 +1,49 @@
+# code: language=yaml
+#
+# Initialize $state namespace with spec.raw and spec.effective
+#
+
+{{- $xr := getCompositeResource . }}
+{{- $metadata := $xr.metadata | default dict }}
+{{- $spec := $xr.spec | default dict }}
+
+{{- $name := $metadata.name | default "argocd" }}
+{{- $clusterName := $spec.clusterName | default $name }}
+{{- $managementPolicies := $spec.managementPolicies | default (list "*") }}
+
+# Default labels
+{{- $defaultLabels := dict
+  "hops.ops.com.ai/managed" "true"
+  (printf "hops.ops.com.ai/%s" (lower $xr.kind)) $name
+}}
+{{- $labels := merge $defaultLabels ($spec.labels | default dict) }}
+
+# Provider config (defaults to clusterName with ProviderConfig)
+{{- $providerConfigRef := dict
+  "name" (($spec.providerConfigRef | default dict).name | default $clusterName | default "default")
+  "kind" (($spec.providerConfigRef | default dict).kind | default "ProviderConfig")
+}}
+
+{{- $namespace := $spec.namespace | default "argocd" }}
+{{- $releaseName := $spec.name | default $name }}
+{{- $values := $spec.values | default dict }}
+{{- $overrideAllValues := $spec.overrideAllValues | default dict }}
+
+{{- $state := dict
+  "spec" (dict
+    "raw" $spec
+    "effective" (dict
+      "name" $name
+      "clusterName" $clusterName
+      "managementPolicies" $managementPolicies
+      "labels" $labels
+      "providerConfigRef" $providerConfigRef
+      "namespace" $namespace
+      "releaseName" $releaseName
+      "values" $values
+      "overrideAllValues" $overrideAllValues
+    )
+  )
+  "observed" (dict)
+  "argocd" (dict)
+}}

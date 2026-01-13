@@ -1,0 +1,73 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: argocds.helm.hops.ops.com.ai
+spec:
+  group: helm.hops.ops.com.ai
+  names:
+    kind: ArgoCD
+    plural: argocds
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              clusterName:
+                description: Name of the target cluster. Used as default for providerConfigRef.name.
+                type: string
+              managementPolicies:
+                type: array
+                items:
+                  type: string
+                default: ["*"]
+              labels:
+                description: Labels applied to all resources.
+                type: object
+                additionalProperties:
+                  type: string
+                x-kubernetes-preserve-unknown-fields: true
+              providerConfigRef:
+                description: Reference to the Helm ProviderConfig.
+                type: object
+                properties:
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                    enum: [ProviderConfig, ClusterProviderConfig]
+              namespace:
+                description: Namespace for the Helm release.
+                type: string
+              name:
+                description: Helm release name. Defaults to XR metadata.name.
+                type: string
+              values:
+                description: Helm values merged with defaults.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              overrideAllValues:
+                description: Helm values that replace all defaults.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+          status:
+            type: object
+            properties:
+              ready:
+                type: boolean
+              release:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                  ready:
+                    type: boolean
+        required: [spec]
