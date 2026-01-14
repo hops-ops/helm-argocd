@@ -1,5 +1,5 @@
 apiVersion: v2
 name: helm-argocd
-version: 0.0.0
+version: 0.1.0
 description: GitOps packaging for the Argo CD Crossplane configuration
 appVersion: 9.3.1
