@@ -2,6 +2,10 @@
 #
 # Helm release for Argo CD
 #
+# Integration defaults:
+# - Prometheus metrics enabled for sync status monitoring
+# - ServiceMonitor created for Prometheus Operator discovery
+#
 
 {{- $argo := $state.argocd }}
 
@@ -30,6 +34,12 @@ spec:
       nameOverride: argocd
       crds:
         install: true
+      # Prometheus metrics for GitOps sync monitoring
+      global:
+        monitoring:
+          enabled: true
+          serviceMonitor:
+            enabled: true
       {{- if $argo.values }}
       {{- toYaml $argo.values | nindent 6 }}
       {{- end }}
